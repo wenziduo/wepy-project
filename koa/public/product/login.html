@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<div>
+				<label>用户名：</label><input type="text" name="userName" id="userName">
+				<label>密码：</label><input type="text" name="passWord" id="passWord">
+				<button onclick="subMit()">提交</button>
+		</div>
+		<script type="text/javascript" src="./js/jquery-1.11.3.js"></script>
+		<script type="text/javascript">
+			function subMit(){
+				var data = {
+					userName: $('#userName').val(),
+					passWord: $('#passWord').val(),
+				}
+				$.ajax({
+					type:"post",
+					url:"/users/login",
+					data,
+					async:true,
+					success: function(res) {
+						console.log(res);
+					}
+				});
+			}
+		</script>
+	</body>
+</html>

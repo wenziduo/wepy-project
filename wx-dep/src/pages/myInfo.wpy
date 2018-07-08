@@ -1,0 +1,48 @@
+<style lang="less">
+    .myBox {
+    padding: 30rpx;width: 88vw;margin: 10rpx auto;
+    box-shadow: 0 0 3px 0 rgb(199, 161, 161);background-color: rgb(253, 249, 249);
+    .myInfo {
+      display: flex;align-items: center;
+      image.img {
+        width: 80rpx;height: 80rpx;box-shadow: 0 0 3px 0 #DDD;border-radius: 50%;
+      }
+      text {
+        padding-left: 15rpx;font-size: 26rpx;
+      }
+    }
+  }
+</style>
+<template>
+    <view>
+      <view class="myBox">
+        <view class="myInfo">
+          <image class="img" src="{{info.avator}}" />
+          <text>{{userInfo.name}}</text>
+        </view>
+      </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import api from '../api/api'
+
+export default class Info extends wepy.page {
+  data = {
+    userInfo: {}
+  }
+
+  async onShow () {
+    const res = await api.getInfo({id: wepy.getStorageSync('userInfo').id})
+    if (res.statusCode === 200) {
+      if (res.data.success === true) {
+        this.userInfo = res.data.userInfo
+        this.$apply()
+      } else {
+        wepy.navigateTo({url: 'login'})
+      }
+    }
+  }
+}
+</script>

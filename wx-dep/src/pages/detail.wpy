@@ -1,0 +1,104 @@
+<style lang="less">
+  .list {
+    padding: 30rpx;width: 88vw;margin: 10rpx auto;
+    box-shadow: 0 0 3px 0 rgb(199, 161, 161);background-color: rgb(253, 249, 249);
+    .myInfo {
+      display: flex;align-items: center;
+      image.img {
+        width: 80rpx;height: 80rpx;box-shadow: 0 0 3px 0 #DDD;border-radius: 50%;
+      }
+      text {
+        padding-left: 15rpx;font-size: 26rpx;
+      }
+    }
+    .title {
+      display: flex;justify-content: space-between;font-size: 32rpx;margin-top: 15rpx;
+    }
+    .content {
+      display: flex;justify-content: space-between;font-size: 26rpx;font-size: #888;
+      margin: 15rpx 0;
+    }
+    .action {
+      display: flex;justify-content: space-between;font-size: 26rpx;font-size: #888;
+      text {
+        width: 33%;
+      }
+    }
+  }
+  .comment {
+    padding: 30rpx;width: 88vw;margin: 10rpx auto;
+    box-shadow: 0 0 3px 0 rgb(199, 161, 161);background-color: rgb(253, 249, 249);
+    .comment_title {
+      display: flex;justify-content: space-between;align-items: center;
+      .info {
+        display: flex;align-items: center;
+        image {
+          width: 80rpx;height: 80rpx;box-shadow: 0 0 3px 0 #DDD;border-radius: 50%;
+        }
+        text {
+          padding-left: 15rpx;font-size: 26rpx;
+        }
+      }
+    }
+    .comment_content {
+      font-size: 28rpx;
+    }
+  }
+</style>
+<template>
+    <view>
+      <view class="list">
+        <view class="myInfo">
+          <image class="img" src="{{content.detail.avator}}" />
+          <text>{{content.detail.name}}</text>
+        </view>
+        <view class="title">
+          <text>标题：{{content.detail.title}}</text>
+        </view>
+        <view class="content">
+          <text>内容：{{content.detail.md}}</text>
+        </view>
+        <view class="action">
+          <text>浏览：{{content.detail.pv}}</text>
+          <text>评论：{{content.detail.comments}}</text>
+          <text>时间：{{content.detail.time}}</text>
+        </view>
+      </view>
+      <repeat for="{{content.comment}}" key="index" index="index" item="item">
+        <view class="comment">
+          <view class="comment_title">
+            <view class="info"><images src="{{item.avator}}" /><text>{{item.name}}</text></view>
+            <text>{{item.beforeAgo}}</text>
+          </view>
+          <view class="comment_content">
+            <text>{{item.content}}</text>
+          </view>
+        </view>
+      </repeat>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import api from '../api/api'
+import moment from 'moment'
+
+export default class Info extends wepy.page {
+  data = {
+    content: {
+      detail: {},
+      comment: [],
+    }
+  }
+  async onLoad(option) {
+      console.log(option)
+      const { id } = option
+      let response = await api.getDetail({ id })
+      if (response.statusCode === 200) {
+        const { data } = response
+        this.content = data
+        this.$apply()
+      }
+    }
+}
+</script>

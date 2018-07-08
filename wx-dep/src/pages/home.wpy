@@ -1,0 +1,85 @@
+<style lang="less">
+  .box {
+    padding: 20rpx;
+    .list {
+      margin-top: 30rpx;padding: 30rpx;
+      box-shadow: 0 0 3px 0 rgb(199, 161, 161);background-color: rgb(253, 249, 249);
+      .myInfo {
+        display: flex;align-items: center;
+        image.img {
+          width: 80rpx;height: 80rpx;box-shadow: 0 0 3px 0 #DDD;border-radius: 50%;
+        }
+        text {
+          padding-left: 15rpx;font-size: 26rpx;
+        }
+      }
+      .title {
+        display: flex;justify-content: space-between;font-size: 32rpx;margin-top: 15rpx;
+      }
+      .content {
+        display: flex;justify-content: space-between;font-size: 26rpx;font-size: #888;
+        margin: 15rpx 0;
+      }
+      .action {
+        display: flex;justify-content: space-between;font-size: 26rpx;font-size: #888;
+        text {
+          width: 33%;
+        }
+      }
+    }
+  }
+</style>
+<template>
+	<view class="box">
+    <repeat for="{{list}}" key="index" index="index" item="item">
+      <view class="list" @tap="goDetail({{item.id}})">
+        <view class="myInfo">
+          <image class="img" src="{{item.avator}}" />
+          <text>{{item.name}}</text>
+        </view>
+        <view class="title">
+          <text>标题：{{item.title}}</text>
+        </view>
+        <view class="content">
+          <text>内容：{{item.md}}</text>
+        </view>
+        <view class="action">
+          <text>浏览：{{item.pv}}</text>
+          <text>评论：{{item.comments}}</text>
+          <text>时间：{{item.beforeAgo}}</text>
+        </view>
+      </view>
+    </repeat>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import api from '../api/api'
+  // import moment from 'moment'
+  export default class Home extends wepy.page {
+    config = {
+      navigationBarTitleText: '首页模块'
+    }
+    data = {
+      list: []
+    }
+    async onShow() {
+      let response = await api.getList()
+      if (response.statusCode === 200) {
+        const { data } = response
+        this.list = data
+        this.$apply()
+      }
+    }
+    methods = {
+      goDetail: (id) => {
+        wepy.navigateTo({url: 'detail?id=' + id})
+      }
+    }
+    computed = {
+      add() {
+        return this.a + 2
+      }
+    }
+  }
+</script>

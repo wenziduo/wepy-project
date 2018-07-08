@@ -1,0 +1,171 @@
+<style lang="less">
+.box {
+		width: 90vw;margin: 0 auto;
+		label {
+				font-size: 35rpx;
+		}
+		.inputs {
+				margin: 10rpx 0;
+    }
+    .list_phone {
+      display: flex;align-items: center;justify-content: space-between;
+      .phone {
+        width: 70vw;
+      }
+      .getCodeButton_true {
+        width: 28vw;font-size: 25rpx;
+      }
+      .getCodeButton_false {
+        width: 28vw;font-size: 25rpx;background-color: #CCC;
+      }
+    }
+		.line {
+				width: 100%;height: 1px;background-color: #EEE;margin: 40rpx 0;
+		}
+		button {
+				margin-top: 25rpx;background-color: green;color: #FFF;
+		}
+		.action {
+				display: flex;align-items: center;justify-content: space-between;color: blue;
+				font-size: 28rpx;padding: 0 0 15rpx 0;
+    }
+    input {
+      // text-align: center;
+    }
+}
+</style>
+<template>
+    <view class="box">
+        <form @submit="handleRegister">
+            <view>
+                <input name="name" class="inputs" placeholder="请输入用户名"/>
+            </view>
+            <view class="line"/>
+            <view>
+                <input name="pass" class="inputs" type="password" placeholder="请输入密码"/>
+            </view>
+            <view class="line"/>
+            <view>
+                <picker bindchange="bindCasPickerChange" value="{{casIndex1}}" range="{{casArray}}">
+                  <view>
+                    <input name="sex" value="{{casArray[casIndex]}}"/>
+                  </view>
+                </picker>
+            </view>
+            <view class="line"/>
+            <view class="list_phone">
+                <input name="phone" class="inputs phne" placeholder="请输入手机号码" @input="phoneChange"/>
+                <button class="{{getCode === true ? 'getCodeButton_true' : 'getCodeButton_false'}}" @tap="{{getCode === true ? 'handleGetCode' : null}}">
+                  {{getCode === true ? '获取验证码' : getCode}}
+                </button>
+            </view>
+            <view class="line"/>
+            <view>
+                <input name="code" class="inputs" placeholder="输入验证码"/>
+            </view>
+            <view class="line"/>
+            <button type="primary" formType="submit">提交</button>
+        </form>
+    </view>
+</template>
+<script>
+import wepy from 'wepy'
+import api from '../api/api'
+import md5 from 'md5'
+export default class Info extends wepy.page {
+  config = {
+    navigationBarTitleText: '欢迎注册逗儿瓢'
+  }
+  data = {
+    info: {},
+    casArray: ['男', '女'],
+    casIndex: 0,
+    phone: null,
+    getCode: true
+  }
+  methods = {
+    handleRegister: async (val) => {
+      val.detail.value.pass = md5(val.detail.value.pass)
+      const params = val.detail.value
+      if (params.sex === '男') { params.sex = '0' } else { params.sex = '1' }
+      console.log(params)
+      wepy.showToast({
+        title: '注册中',
+        icon: 'loading',
+        mask: true
+      })
+      const response = await api.postRegister(params)
+      if (response.statusCode === 200) {
+        if (response.data.success === true) {
+          wepy.showToast({
+            title: '恭喜注册成功',
+            icon: 'success',
+            duration: 1000,
+            mask: true
+          })
+          await new Promise((resolve, reject) => {
+            setTimeout(() => {
+              resolve()
+            }, 1000)
+          })
+          wepy.navigateTo({url: 'login'})
+        } else {
+          setTimeout(() => {
+            wepy.showToast({
+              title: response.data.msg,
+              icon: 'loading',
+              duration: 1000
+            })
+          }, 800)
+        }
+      }
+    },
+    bindCasPickerChange: (e) => {
+      console.log(e.detail.value)
+      this.casIndex = e.detail.value
+      this.$apply()
+    },
+    phoneChange: (e) => {
+      this.phone = e.detail.value
+      this.$apply()
+    },
+    handleGetCode: async () => {
+      this.getCode = 60
+      this.$apply()
+      const timer = setInterval(() => {
+        this.getCode--
+        this.$apply()
+        if (this.getCode === 0) {
+          this.getCode = true
+          this.$apply()
+          clearInterval(timer)
+        }
+      }, 1000)
+      wepy.showToast({
+        title: '发送中',
+        icon: 'loading',
+        mask: true
+      })
+      const res = await api.postCode({phone: this.phone, action: 'register'})
+      if (res.statusCode === 200) {
+        wepy.showToast({
+          title: '发送成功',
+          icon: 'success',
+          duration: 1000,
+          mask: true
+        })
+      } else {
+        wepy.showToast({
+          title: '发送失败',
+          icon: 'loading',
+          duration: 1000,
+          mask: true
+        })
+      }
+    }
+  }
+  onLoad = function () {
+    console.log('PPPPPP11111111111')
+  }
+}
+</script>
